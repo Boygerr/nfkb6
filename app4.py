@@ -15,27 +15,62 @@ Let's test the hypothesis
 
 st.sidebar.header("Stimulus")
 tlr_strength = st.sidebar.slider("TLR Activation (IKK strength)", 0.0, 5.0, 2.0)
-tlr_strength_manual = st.sidebar.number_input("Or enter TLR value manually", min_value=0.0, max_value=5.0, value=tlr_strength, step=0.1)
-tlr_strength = tlr_strength_manual  # overwrite slider if user inputs manually
+tlr_strength_manual = st.sidebar.number_input(
+    "Or enter TLR value manually",
+    min_value=0.0,
+    max_value=5.0,
+    value=tlr_strength,
+    step=0.1
+)
+tlr_strength = tlr_strength_manual
 
 st.sidebar.header("Inhibitors")
-nfkb_inhib = st.sidebar.slider("NF-κB Phosphorylation Inhibitor (blocks nuclear entry)", 0.0, 1.0, 0.0)
-nfkb_inhib_manual = st.sidebar.number_input("Or enter NF-κB inhibitor manually", min_value=0.0, max_value=1.0, value=nfkb_inhib, step=0.01)
+nfkb_inhib = st.sidebar.slider(
+    "NF-κB Phosphorylation Inhibitor (blocks nuclear entry)",
+    0.0, 1.0, 0.0
+)
+nfkb_inhib_manual = st.sidebar.number_input(
+    "Or enter NF-κB inhibitor manually",
+    min_value=0.0,
+    max_value=1.0,
+    value=nfkb_inhib,
+    step=0.01
+)
 nfkb_inhib = nfkb_inhib_manual
 
-ikba_inhib = st.sidebar.slider("IκBα Phosphorylation Inhibitor (blocks IκB degradation)", 0.0, 1.0, 0.0)
-ikba_inhib_manual = st.sidebar.number_input("Or enter IκB inhibitor manually", min_value=0.0, max_value=1.0, value=ikba_inhib, step=0.01)
+ikba_inhib = st.sidebar.slider(
+    "IκBα Phosphorylation Inhibitor (blocks IκB degradation)",
+    0.0, 1.0, 0.0
+)
+ikba_inhib_manual = st.sidebar.number_input(
+    "Or enter IκB inhibitor manually",
+    min_value=0.0,
+    max_value=1.0,
+    value=ikba_inhib,
+    step=0.01
+)
 ikba_inhib = ikba_inhib_manual
 
+# ----------------------------
+# Graph display controls
+# ----------------------------
+st.sidebar.header("Graph Display")
+
+show_nfkb = st.sidebar.checkbox("Show Nuclear NF-κB", value=True)
+show_ikba = st.sidebar.checkbox("Show IκBα", value=True)
+show_tnf = st.sidebar.checkbox("Show TNF Gene Expression", value=True)
+
+# ----------------------------
+# Parameters
+# ----------------------------
 k_import = 1.0
 k_export = 0.5
 k_deg_I = 1.5
-k_syn_I = 0.1    # basal synthesis/decay balanced at 1
+k_syn_I = 0.1
 k_decay_I = 0.1
 k_tnf = 1.5
 k_tnf_decay = 0.3
 
-# mRNA / translation rates (slow to prevent unrealistic spikes)
 k_tx = 0.2
 k_mdeg = 0.05
 k_tl = 0.1
@@ -45,7 +80,7 @@ k_tl = 0.1
 # ----------------------------
 Nc0 = 1.0
 Nn0 = 0.0
-Im0 = 0.0   # IκB mRNA
+Im0 = 0.0
 I0 = 1.0
 TNF0 = 0.0
 
@@ -56,33 +91,23 @@ def nfkb_model(t, y):
     Nc, Nn, Im, I, TNF = y
     IKK = tlr_strength
 
-    # Basal IκB synthesis/decay
     basal_synthesis = k_syn_I
     basal_decay = k_decay_I
 
-    # TLR-dependent IκB degradation (linearly scaled by inhibitor)
     tlr_deg = k_deg_I * IKK * I * (1 - ikba_inhib)
 
-    # mRNA dynamics: NF-κB induced only if TLR > 0
     dIm = k_tx * Nn * (IKK / (IKK + 1e-6)) - k_mdeg * Im
 
-    # IκB protein dynamics
     dI = basal_synthesis - basal_decay - tlr_deg + k_tl * Im
 
-    # ----------------------------
-    # NF-κB nuclear import/export (dose-dependent)
-    # ----------------------------
     if IKK > 0:
-        # Fraction of IκB degraded relative to maximum possible degradation
         degraded_fraction = tlr_deg / (k_deg_I * IKK * I + 1e-6)
-        # Nuclear NF-κB import proportional to fraction degraded and NF-κB inhibitor
         effective_import = k_import * Nc * degraded_fraction * (1 - nfkb_inhib)
         export_N = k_export * Nn * (1 + I)
     else:
         effective_import = 0.0
         export_N = 0.0
 
-    # TNF transcription
     dTNF = k_tnf * Nn - k_tnf_decay * TNF
 
     dNc = -effective_import + export_N
@@ -103,9 +128,14 @@ sol = solve_ivp(nfkb_model, t_span, [Nc0, Nn0, Im0, I0, TNF0], t_eval=t_eval)
 # ----------------------------
 fig, ax = plt.subplots(figsize=(8,5))
 
-ax.plot(sol.t, sol.y[1], label="Nuclear NF-κB")
-ax.plot(sol.t, sol.y[3], label="IκBα")
-ax.plot(sol.t, sol.y[4], label="TNF Gene Expression")
+if show_nfkb:
+    ax.plot(sol.t, sol.y[1], label="Nuclear NF-κB")
+
+if show_ikba:
+    ax.plot(sol.t, sol.y[3], label="IκBα")
+
+if show_tnf:
+    ax.plot(sol.t, sol.y[4], label="TNF Gene Expression")
 
 ax.set_xlabel("Time")
 ax.set_ylabel("Concentration / Activity")
@@ -126,6 +156,3 @@ st.markdown("""
 - Reset the NFkB phosphorylation inhibitor and start increasing the ikba phosphorylation inhibitor
     - How does this differ to the NFkB phosphorylation inhibitor
 """)
-
-
-

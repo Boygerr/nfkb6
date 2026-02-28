@@ -52,38 +52,35 @@ TNF0 = 0.0
 # ----------------------------
 
 def nfkb_model(t, y):
-    Nc, Nn, I, TNF = y
+    Nc, Nn, Im, I, TNF = y
 
-    IKK = tlr_strength  # TLR stimulus
+    IKK = tlr_strength
 
-    # Basal synthesis and decay balance → I stable at 1
-    basal_synthesis = k_syn_I
-    basal_decay = k_syn_I  # balances basal synthesis
+    # Basal IκB synthesis/decay
+    basal_synthesis = 0.1
+    basal_decay = 0.1
 
-    # TLR-dependent IκB degradation (reduced by inhibitor)
+    # TLR-dependent degradation (IκB inhibitor reduces)
     tlr_deg = k_deg_I * IKK * I * (1 - ikba_inhib)
 
-    # ------------------------------
-    # NF-κB-induced IκB synthesis with threshold
-    # ------------------------------
-    NFkB_threshold = 1e-3
-    induced_synthesis = k_syn_I * Nn if Nn > NFkB_threshold else 0.0
+    # mRNA dynamics
+    dIm = k_tx * Nn - k_mdeg * Im
 
-    # Total IκB dynamics
-    dI = basal_synthesis - basal_decay - tlr_deg + induced_synthesis
+    # IκB protein dynamics
+    dI = basal_synthesis - basal_decay - tlr_deg + k_tl * Im
 
-    # NF-κB nuclear import proportional to TLR-induced IκB degradation fraction
+    # NF-κB nuclear import proportional to degraded IκB
     degraded_fraction = tlr_deg / (tlr_deg + 1e-6) if tlr_deg > 0 else 0.0
     effective_import = k_import * Nc * degraded_fraction * (1 - nfkb_inhib)
     export_N = k_export * Nn
 
-    # TNF transcription driven by nuclear NF-κB
+    # TNF transcription
     dTNF = k_tnf * Nn - k_tnf_decay * TNF
 
     dNc = -effective_import + export_N
     dNn = effective_import - export_N
 
-    return [dNc, dNn, dI, dTNF]
+    return [dNc, dNn, dIm, dI, dTNF]
 
 # ----------------------------
 # Solve
@@ -123,6 +120,7 @@ st.markdown("""
 - Is inhibiting NF-κB entry equivalent to blocking IκB degradation?
 
 """)
+
 
 
 

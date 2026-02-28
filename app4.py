@@ -64,9 +64,12 @@ def nfkb_model(t, y):
     # IκB protein dynamics
     dI = basal_synthesis - basal_decay - tlr_deg + k_tl * Im
 
-    # NF-κB nuclear import/export
-    effective_import = k_import * Nc / (1 + I) * (1 - nfkb_inhib)
-    export_N = k_export * Nn * (1 + I)
+    if IKK > 0:
+        effective_import = k_import * Nc / (1 + I) * (1 - nfkb_inhib)
+        export_N = k_export * Nn * (1 + I)
+    else:
+        effective_import = 0.0
+        export_N = 0.0
 
     # TNF transcription
     dTNF = k_tnf * Nn - k_tnf_decay * TNF
@@ -108,5 +111,6 @@ st.markdown("""
 - Why does blocking IκB degradation suppress everything?
 - Is inhibiting NF-κB entry equivalent to blocking IκB degradation?
 """)
+
 
 

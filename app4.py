@@ -29,21 +29,17 @@ k_decay_I = 0.1
 k_tnf = 1.5
 k_tnf_decay = 0.3
 
-# mRNA / translation rates
+# mRNA / translation rates (slow to prevent unrealistic spikes)
 k_tx = 0.2
 k_mdeg = 0.05
 k_tl = 0.1
-
-# Hill parameters for drug-like inhibitor effect
-IC50 = 0.5
-h = 3.0
 
 # ----------------------------
 # Initial Conditions
 # ----------------------------
 Nc0 = 1.0
 Nn0 = 0.0
-Im0 = 0.0
+Im0 = 0.0   # IκB mRNA
 I0 = 1.0
 TNF0 = 0.0
 
@@ -58,14 +54,8 @@ def nfkb_model(t, y):
     basal_synthesis = k_syn_I
     basal_decay = k_decay_I
 
-    # ----------------------------
-    # Drug-like IκB inhibitor (Hill function, saturating)
-    # ----------------------------
-    drug_factor = 1 - ikba_inhib**h / (IC50**h + ikba_inhib**h)
-    drug_factor = max(0.0, min(drug_factor, 1.0))  # ensure 0 ≤ factor ≤ 1
-
-    # TLR-dependent IκB degradation scaled by drug factor
-    tlr_deg = k_deg_I * IKK * I * drug_factor
+    # TLR-dependent IκB degradation (linearly scaled by inhibitor)
+    tlr_deg = k_deg_I * IKK * I * (1 - ikba_inhib)
 
     # mRNA dynamics: NF-κB induced only if TLR > 0
     dIm = k_tx * Nn * (IKK / (IKK + 1e-6)) - k_mdeg * Im
@@ -74,10 +64,12 @@ def nfkb_model(t, y):
     dI = basal_synthesis - basal_decay - tlr_deg + k_tl * Im
 
     # ----------------------------
-    # NF-κB nuclear import/export
+    # NF-κB nuclear import/export (dose-dependent)
     # ----------------------------
     if IKK > 0:
+        # Fraction of IκB degraded relative to maximum possible degradation
         degraded_fraction = tlr_deg / (k_deg_I * IKK * I + 1e-6)
+        # Nuclear NF-κB import proportional to fraction degraded and NF-κB inhibitor
         effective_import = k_import * Nc * degraded_fraction * (1 - nfkb_inhib)
         export_N = k_export * Nn * (1 + I)
     else:

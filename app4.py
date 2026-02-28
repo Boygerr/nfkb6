@@ -63,8 +63,14 @@ def nfkb_model(t, y):
     # TLR-dependent IκB degradation (reduced by inhibitor)
     tlr_deg = k_deg_I * IKK * I * (1 - ikba_inhib)
 
+    # ------------------------------
+    # NF-κB-induced IκB synthesis with threshold
+    # ------------------------------
+    NFkB_threshold = 1e-3
+    induced_synthesis = k_syn_I * Nn if Nn > NFkB_threshold else 0.0
+
     # Total IκB dynamics
-    dI = basal_synthesis - basal_decay - tlr_deg + k_syn_I * Nn  # NF-κB induced
+    dI = basal_synthesis - basal_decay - tlr_deg + induced_synthesis
 
     # NF-κB nuclear import proportional to TLR-induced IκB degradation fraction
     degraded_fraction = tlr_deg / (tlr_deg + 1e-6) if tlr_deg > 0 else 0.0
@@ -117,5 +123,6 @@ st.markdown("""
 - Is inhibiting NF-κB entry equivalent to blocking IκB degradation?
 
 """)
+
 
 

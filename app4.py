@@ -65,10 +65,12 @@ def nfkb_model(t, y):
     # IκB protein dynamics
     dI = basal_synthesis - basal_decay - tlr_deg + k_tl * Im
 
-    # NF-κB nuclear import proportional to TLR-induced IκB degradation
-    degraded_fraction = tlr_deg / (tlr_deg + 1e-6) if tlr_deg > 0 else 0.0
-    effective_import = k_import * Nc * degraded_fraction * (1 - nfkb_inhib)
-    export_N = k_export * Nn
+    # ----------------------------
+    # NF-κB nuclear import/export depending on IκB levels
+    # ----------------------------
+    # Import decreases with rising IκB, export increases with IκB
+    effective_import = k_import * Nc / (1 + I) * (1 - nfkb_inhib)
+    export_N = k_export * Nn * (1 + I)
 
     # TNF transcription driven by nuclear NF-κB
     dTNF = k_tnf * Nn - k_tnf_decay * TNF

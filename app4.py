@@ -6,8 +6,7 @@ import matplotlib.pyplot as plt
 st.title("NF-κB – IκBα – TNF Dynamics During TLR Signalling")
 
 st.markdown("""
-Model of NF-κB activation, IκBα feedback, and TNF gene expression 
-during Toll-like receptor stimulation.
+Let's test the hypothesis
 """)
 
 # ----------------------------
@@ -107,12 +106,17 @@ ax.legend()
 st.pyplot(fig)
 
 # ----------------------------
-# Discussion Prompts
+# Tasks
 # ----------------------------
-st.markdown("### Discussion Prompts")
+st.markdown("### Do the following tasks")
 st.markdown("""
-- Why does TNF follow nuclear NF-κB with a delay?
-- What happens when NF-κB phosphorylation is inhibited?
-- Why does blocking IκB degradation suppress everything?
-- Is inhibiting NF-κB entry equivalent to blocking IκB degradation?
+- Stimulate the cells (Set TLR Activation to 0.2)
+    - Why does IkB decrease then increase?
+    - Why does TNF increase in line with nuclear NFKB, but delayed?
+    - Why does nuclear NFkB appear to decrease after an initial burst?
+- Start increasing the NFkB phosphorylation inhibitor
+    - What do you see?
+- Reset the NFkB phosphorylation inhibitor and start increasing the ikba phosphorylation inhibitor
+    - How does this differ to the NFkB phosphorylation inhibitor
 """)
+

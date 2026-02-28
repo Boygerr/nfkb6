@@ -10,14 +10,22 @@ Let's test the hypothesis
 """)
 
 # ----------------------------
-# Sidebar Controls
+# Sidebar Controls with manual input
 # ----------------------------
+
 st.sidebar.header("Stimulus")
 tlr_strength = st.sidebar.slider("TLR Activation (IKK strength)", 0.0, 5.0, 2.0)
+tlr_strength_manual = st.sidebar.number_input("Or enter TLR value manually", min_value=0.0, max_value=5.0, value=tlr_strength, step=0.1)
+tlr_strength = tlr_strength_manual  # overwrite slider if user inputs manually
 
 st.sidebar.header("Inhibitors")
 nfkb_inhib = st.sidebar.slider("NF-κB Phosphorylation Inhibitor (blocks nuclear entry)", 0.0, 1.0, 0.0)
+nfkb_inhib_manual = st.sidebar.number_input("Or enter NF-κB inhibitor manually", min_value=0.0, max_value=1.0, value=nfkb_inhib, step=0.01)
+nfkb_inhib = nfkb_inhib_manual
+
 ikba_inhib = st.sidebar.slider("IκBα Phosphorylation Inhibitor (blocks IκB degradation)", 0.0, 1.0, 0.0)
+ikba_inhib_manual = st.sidebar.number_input("Or enter IκB inhibitor manually", min_value=0.0, max_value=1.0, value=ikba_inhib, step=0.01)
+ikba_inhib = ikba_inhib_manual
 
 k_import = 1.0
 k_export = 0.5
@@ -118,5 +126,6 @@ st.markdown("""
 - Reset the NFkB phosphorylation inhibitor and start increasing the ikba phosphorylation inhibitor
     - How does this differ to the NFkB phosphorylation inhibitor
 """)
+
 
 

@@ -55,7 +55,7 @@ def nfkb_model(t, y):
     basal_synthesis = k_syn_I
     basal_decay = k_decay_I
 
-    # TLR-dependent IκB degradation
+    # TLR-dependent IκB degradation (blocked by inhibitor)
     tlr_deg = k_deg_I * IKK * I * (1 - ikba_inhib)
 
     # mRNA dynamics: NF-κB induced only if TLR > 0
@@ -64,8 +64,10 @@ def nfkb_model(t, y):
     # IκB protein dynamics
     dI = basal_synthesis - basal_decay - tlr_deg + k_tl * Im
 
+    # NF-κB nuclear import/export
     if IKK > 0:
-        effective_import = k_import * Nc / (1 + I) * (1 - nfkb_inhib)
+        # Block NF-κB nuclear import if NF-κB inhibitor or IκB phosphorylation inhibitor is applied
+        effective_import = k_import * Nc / (1 + I) * (1 - nfkb_inhib) * (1 - ikba_inhib)
         export_N = k_export * Nn * (1 + I)
     else:
         effective_import = 0.0
@@ -111,6 +113,3 @@ st.markdown("""
 - Why does blocking IκB degradation suppress everything?
 - Is inhibiting NF-κB entry equivalent to blocking IκB degradation?
 """)
-
-
-

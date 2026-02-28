@@ -49,30 +49,30 @@ TNF0 = 0.0
 # ----------------------------
 def nfkb_model(t, y):
     Nc, Nn, Im, I, TNF = y
-
     IKK = tlr_strength
 
-    # Basal IκB synthesis and decay (keeps I stable at 1)
+    # Basal IκB synthesis/decay
     basal_synthesis = k_syn_I
     basal_decay = k_decay_I
 
-    # TLR-dependent IκB degradation (reduced by inhibitor)
+    # TLR-dependent degradation
     tlr_deg = k_deg_I * IKK * I * (1 - ikba_inhib)
 
-    # mRNA dynamics (slow, NF-κB induced)
+    # mRNA dynamics
     dIm = k_tx * Nn - k_mdeg * Im
 
-    # IκB protein dynamics
-    dI = basal_synthesis - basal_decay - tlr_deg + k_tl * Im
+    # Only translate IκB protein if nuclear NF-κB is significant
+    NFkB_threshold = 1e-3
+    induced_translation = k_tl * Im if Nn > NFkB_threshold else 0.0
 
-    # ----------------------------
-    # NF-κB nuclear import/export depending on IκB levels
-    # ----------------------------
-    # Import decreases with rising IκB, export increases with IκB
+    # IκB protein dynamics
+    dI = basal_synthesis - basal_decay - tlr_deg + induced_translation
+
+    # NF-κB nuclear import/export
     effective_import = k_import * Nc / (1 + I) * (1 - nfkb_inhib)
     export_N = k_export * Nn * (1 + I)
 
-    # TNF transcription driven by nuclear NF-κB
+    # TNF transcription
     dTNF = k_tnf * Nn - k_tnf_decay * TNF
 
     dNc = -effective_import + export_N
@@ -112,3 +112,4 @@ st.markdown("""
 - Why does blocking IκB degradation suppress everything?
 - Is inhibiting NF-κB entry equivalent to blocking IκB degradation?
 """)
+

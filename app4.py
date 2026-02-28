@@ -34,6 +34,10 @@ k_tx = 0.2
 k_mdeg = 0.05
 k_tl = 0.1
 
+# Hill function parameters for drug-like inhibition
+IC50 = 0.5   # half-maximal inhibitor effect
+h = 2.0      # Hill coefficient (steepness)
+
 # ----------------------------
 # Initial Conditions
 # ----------------------------
@@ -54,8 +58,13 @@ def nfkb_model(t, y):
     basal_synthesis = k_syn_I
     basal_decay = k_decay_I
 
-    # TLR-dependent IκB degradation (blocked by inhibitor)
-    tlr_deg = k_deg_I * IKK * I * (1 - ikba_inhib)
+    # ----------------------------
+    # Drug-like IκB phosphorylation inhibitor (Hill function)
+    # ----------------------------
+    drug_effect = ikba_inhib**h / (IC50**h + ikba_inhib**h)
+
+    # TLR-dependent IκB degradation scaled by drug effect
+    tlr_deg = k_deg_I * IKK * I * (1 - drug_effect)
 
     # mRNA dynamics: NF-κB induced only if TLR > 0
     dIm = k_tx * Nn * (IKK / (IKK + 1e-6)) - k_mdeg * Im

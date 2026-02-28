@@ -54,29 +54,29 @@ TNF0 = 0.0
 def nfkb_model(t, y):
     Nc, Nn, I, TNF = y
 
-    # Effective IKK activity
-    IKK = tlr_strength
-    
-    # IκB degradation is TLR-dependent, reduced by inhibitor
-    effective_deg = k_deg_I * IKK * I * (1 - ikba_inhib)
-    
-    # NF-κB can enter nucleus only if IκB is degraded
-    # Import is proportional to degraded fraction
-    degraded_fraction = effective_deg / (effective_deg + k_decay_I * I + 1e-6)  # avoid div by zero
+    IKK = tlr_strength  # TLR stimulus
+
+    # Basal IκB synthesis keeps I at 1 if no stimulus
+    basal_synthesis = k_syn_I  # e.g., 0.1–1.0
+    basal_decay = 0.0  # negligible basal degradation
+
+    # TLR-dependent degradation (blocked by IκB inhibitor)
+    tlr_deg = k_deg_I * IKK * I * (1 - ikba_inhib)
+
+    # Total IκB dynamics
+    dI = basal_synthesis - basal_decay - tlr_deg + k_syn_I * Nn  # NF-κB induced
+
+    # NF-κB nuclear import proportional to IκB degradation fraction
+    degraded_fraction = tlr_deg / (tlr_deg + 1e-6) if tlr_deg > 0 else 0.0
     effective_import = k_import * Nc * degraded_fraction * (1 - nfkb_inhib)
-    
     export_N = k_export * Nn
-    
-    # IκB synthesis
-    syn_I = k_syn_I * Nn
-    
-    # TNF transcription driven by nuclear NF-κB
+
+    # TNF transcription
     dTNF = k_tnf * Nn - k_tnf_decay * TNF
-    
+
     dNc = -effective_import + export_N
     dNn = effective_import - export_N
-    dI = syn_I - effective_deg - k_decay_I * I
-    
+
     return [dNc, dNn, dI, dTNF]
 
 # ----------------------------
@@ -117,3 +117,4 @@ st.markdown("""
 - Is inhibiting NF-κB entry equivalent to blocking IκB degradation?
 
 """)
+

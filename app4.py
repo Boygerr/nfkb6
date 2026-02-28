@@ -64,10 +64,14 @@ def nfkb_model(t, y):
     # IκB protein dynamics
     dI = basal_synthesis - basal_decay - tlr_deg + k_tl * Im
 
-    # NF-κB nuclear import/export
+    # ----------------------------
+    # NF-κB nuclear import/export (dose-dependent for IκB inhibitor)
+    # ----------------------------
     if IKK > 0:
-        # Block NF-κB nuclear import if NF-κB inhibitor or IκB phosphorylation inhibitor is applied
-        effective_import = k_import * Nc / (1 + I) * (1 - nfkb_inhib) * (1 - ikba_inhib)
+        # Fraction of IκB degraded
+        degraded_fraction = tlr_deg / (I + 1e-6)  # scales 0 → 1 with inhibitor and TLR
+        # Nuclear NF-κB import proportional to fraction degraded
+        effective_import = k_import * Nc * degraded_fraction * (1 - nfkb_inhib)
         export_N = k_export * Nn * (1 + I)
     else:
         effective_import = 0.0

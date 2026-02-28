@@ -37,6 +37,7 @@ k_syn_I = 1.0
 k_decay_I = 0.1
 k_tnf = 1.5
 k_tnf_decay = 0.3
+Im0 = 0.0
 
 # ----------------------------
 # Initial Conditions
@@ -89,7 +90,7 @@ def nfkb_model(t, y):
 t_span = [0, 50]
 t_eval = np.linspace(0, 50, 1000)
 
-sol = solve_ivp(nfkb_model, t_span, [Nc0, Nn0, I0, TNF0], t_eval=t_eval)
+sol = solve_ivp(nfkb_model, t_span, [Nc0, Nn0, Im0, I0, TNF0], t_eval=t_eval)
 
 # ----------------------------
 # Plot
@@ -120,6 +121,7 @@ st.markdown("""
 - Is inhibiting NF-κB entry equivalent to blocking IκB degradation?
 
 """)
+
 
 
 

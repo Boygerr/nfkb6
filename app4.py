@@ -13,7 +13,6 @@ during Toll-like receptor stimulation.
 # ----------------------------
 # Sidebar Controls
 # ----------------------------
-
 st.sidebar.header("Stimulus")
 tlr_strength = st.sidebar.slider("TLR Activation (IKK strength)", 0.0, 5.0, 2.0)
 
@@ -68,8 +67,8 @@ def nfkb_model(t, y):
     # NF-κB nuclear import/export (dose-dependent for IκB inhibitor)
     # ----------------------------
     if IKK > 0:
-        # Fraction of IκB degraded
-        degraded_fraction = tlr_deg / (I + 1e-6)  # scales 0 → 1 with inhibitor and TLR
+        # Fraction of IκB degraded relative to maximum possible degradation
+        degraded_fraction = tlr_deg / (k_deg_I * IKK * I + 1e-6)
         # Nuclear NF-κB import proportional to fraction degraded
         effective_import = k_import * Nc * degraded_fraction * (1 - nfkb_inhib)
         export_N = k_export * Nn * (1 + I)

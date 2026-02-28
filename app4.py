@@ -19,7 +19,6 @@ st.sidebar.header("Inhibitors")
 nfkb_inhib = st.sidebar.slider("NF-κB Phosphorylation Inhibitor (blocks nuclear entry)", 0.0, 1.0, 0.0)
 ikba_inhib = st.sidebar.slider("IκBα Phosphorylation Inhibitor (blocks IκB degradation)", 0.0, 1.0, 0.0)
 
-st.sidebar.header("Kinetic Parameters")
 k_import = 1.0
 k_export = 0.5
 k_deg_I = 1.5
@@ -119,4 +118,5 @@ st.markdown("""
 - Reset the NFkB phosphorylation inhibitor and start increasing the ikba phosphorylation inhibitor
     - How does this differ to the NFkB phosphorylation inhibitor
 """)
+
 

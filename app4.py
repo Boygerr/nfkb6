@@ -34,12 +34,12 @@ tlr_strength = st.session_state.tlr_strength
 st.sidebar.header("Inhibitors")
 
 nfkb_inhib = st.sidebar.slider(
-    "NF-κB Phosphorylation Inhibitor (blocks nuclear entry)",
+    "NF-κB Phosphorylation Inhibitor)",
     0.0, 1.0, 0.0
 )
 
 ikba_inhib = st.sidebar.slider(
-    "IκBα Phosphorylation Inhibitor (blocks IκB degradation)",
+    "IκBα Phosphorylation Inhibitor",
     0.0, 1.0, 0.0
 )
 
@@ -159,4 +159,5 @@ Question: What should inhibiting ikba and NFkB phosphorylation acomplish?
 - Reset the NFkB phosphorylation inhibitor and start increasing the ikba phosphorylation inhibitor
     - How does this differ to the NFkB phosphorylation inhibitor
 """)
+
 

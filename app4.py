@@ -5,10 +5,6 @@ import matplotlib.pyplot as plt
 
 st.title("NF-κB – IκBα – TNF Dynamics During TLR Signalling")
 
-st.markdown("""
-Let's test the hypothesis
-""")
-
 # ----------------------------
 # Stimulus Button (replaces slider)
 # ----------------------------
@@ -159,5 +155,6 @@ Question: What should inhibiting ikba and NFkB phosphorylation acomplish?
 - Reset the NFkB phosphorylation inhibitor and start increasing the ikba phosphorylation inhibitor
     - How does this differ to the NFkB phosphorylation inhibitor
 """)
+
 
 

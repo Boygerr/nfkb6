@@ -141,7 +141,7 @@ ax.set_xlabel("Time")
 ax.set_ylabel("Concentration / Activity")
 
 # 🔒 Fix Y-axis range
-ax.set_ylim(0, 3)
+ax.set_ylim(0, 3.5)
 
 ax.legend()
 st.pyplot(fig)
@@ -160,5 +160,6 @@ st.markdown("""
 - Reset the NFkB phosphorylation inhibitor and start increasing the ikba phosphorylation inhibitor
     - How does this differ to the NFkB phosphorylation inhibitor
 """)
+
 
 

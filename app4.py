@@ -14,7 +14,7 @@ Let's test the hypothesis
 # ----------------------------
 
 st.sidebar.header("Stimulus")
-tlr_strength = st.sidebar.slider("TLR Activation (IKK strength)", 0.0, 5.0, 2.0)
+tlr_strength = st.sidebar.slider("TLR Activation (LPS)", 0.0, 5.0, 2.0)
 tlr_strength_manual = st.sidebar.number_input(
     "Or enter TLR value manually",
     min_value=0.0,
@@ -156,3 +156,4 @@ st.markdown("""
 - Reset the NFkB phosphorylation inhibitor and start increasing the ikba phosphorylation inhibitor
     - How does this differ to the NFkB phosphorylation inhibitor
 """)
+

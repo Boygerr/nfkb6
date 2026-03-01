@@ -27,8 +27,6 @@ if st.sidebar.button("Reset (No Stimulus)"):
 
 tlr_strength = st.session_state.tlr_strength
 
-st.sidebar.write(f"Current TLR strength: {tlr_strength}")
-
 # ----------------------------
 # Inhibitors
 # ----------------------------
@@ -153,8 +151,12 @@ st.markdown("""
     - Why does IkB decrease then increase?
     - Why does TNF increase in line with nuclear NFKB, but delayed?
     - Why does nuclear NFkB appear to decrease after an initial burst?
+
+Question: What should inhibiting ikba and NFkB phosphorylation acomplish?
+
 - Start increasing the NFkB phosphorylation inhibitor
     - What do you see?
 - Reset the NFkB phosphorylation inhibitor and start increasing the ikba phosphorylation inhibitor
     - How does this differ to the NFkB phosphorylation inhibitor
 """)
+

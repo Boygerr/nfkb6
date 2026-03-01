@@ -10,50 +10,45 @@ Let's test the hypothesis
 """)
 
 # ----------------------------
-# Sidebar Controls with manual input
+# Stimulus Button (replaces slider)
 # ----------------------------
 
 st.sidebar.header("Stimulus")
-tlr_strength = st.sidebar.slider("TLR Activation (LPS)", 0.0, 5.0, 2.0)
-tlr_strength_manual = st.sidebar.number_input(
-    "Or enter TLR value manually",
-    min_value=0.0,
-    max_value=5.0,
-    value=tlr_strength,
-    step=0.1
-)
-tlr_strength = tlr_strength_manual
+
+# Initialize session state
+if "tlr_strength" not in st.session_state:
+    st.session_state.tlr_strength = 0.0  # default = unstimulated
+
+if st.sidebar.button("Stimulate (LPS)"):
+    st.session_state.tlr_strength = 0.2
+
+if st.sidebar.button("Reset (No Stimulus)"):
+    st.session_state.tlr_strength = 0.0
+
+tlr_strength = st.session_state.tlr_strength
+
+st.sidebar.write(f"Current TLR strength: {tlr_strength}")
+
+# ----------------------------
+# Inhibitors
+# ----------------------------
 
 st.sidebar.header("Inhibitors")
+
 nfkb_inhib = st.sidebar.slider(
     "NF-κB Phosphorylation Inhibitor (blocks nuclear entry)",
     0.0, 1.0, 0.0
 )
-nfkb_inhib_manual = st.sidebar.number_input(
-    "Or enter NF-κB inhibitor manually",
-    min_value=0.0,
-    max_value=1.0,
-    value=nfkb_inhib,
-    step=0.01
-)
-nfkb_inhib = nfkb_inhib_manual
 
 ikba_inhib = st.sidebar.slider(
     "IκBα Phosphorylation Inhibitor (blocks IκB degradation)",
     0.0, 1.0, 0.0
 )
-ikba_inhib_manual = st.sidebar.number_input(
-    "Or enter IκB inhibitor manually",
-    min_value=0.0,
-    max_value=1.0,
-    value=ikba_inhib,
-    step=0.01
-)
-ikba_inhib = ikba_inhib_manual
 
 # ----------------------------
 # Graph display controls
 # ----------------------------
+
 st.sidebar.header("Graph Display")
 
 show_nfkb = st.sidebar.checkbox("Show Nuclear NF-κB", value=True)
@@ -63,6 +58,7 @@ show_tnf = st.sidebar.checkbox("Show TNF Gene Expression", value=True)
 # ----------------------------
 # Parameters
 # ----------------------------
+
 k_import = 1.0
 k_export = 0.5
 k_deg_I = 1.5
@@ -78,6 +74,7 @@ k_tl = 0.1
 # ----------------------------
 # Initial Conditions
 # ----------------------------
+
 Nc0 = 1.0
 Nn0 = 0.0
 Im0 = 0.0
@@ -87,6 +84,7 @@ TNF0 = 0.0
 # ----------------------------
 # Model
 # ----------------------------
+
 def nfkb_model(t, y):
     Nc, Nn, Im, I, TNF = y
     IKK = tlr_strength
@@ -97,7 +95,6 @@ def nfkb_model(t, y):
     tlr_deg = k_deg_I * IKK * I * (1 - ikba_inhib)
 
     dIm = k_tx * Nn * (IKK / (IKK + 1e-6)) - k_mdeg * Im
-
     dI = basal_synthesis - basal_decay - tlr_deg + k_tl * Im
 
     if IKK > 0:
@@ -118,6 +115,7 @@ def nfkb_model(t, y):
 # ----------------------------
 # Solve ODE
 # ----------------------------
+
 t_span = [0, 50]
 t_eval = np.linspace(0, 50, 1000)
 
@@ -126,6 +124,7 @@ sol = solve_ivp(nfkb_model, t_span, [Nc0, Nn0, Im0, I0, TNF0], t_eval=t_eval)
 # ----------------------------
 # Plot
 # ----------------------------
+
 fig, ax = plt.subplots(figsize=(8,5))
 
 if show_nfkb:
@@ -139,19 +138,18 @@ if show_tnf:
 
 ax.set_xlabel("Time")
 ax.set_ylabel("Concentration / Activity")
-
-# 🔒 Fix Y-axis range
-ax.set_ylim(0, 3.5)
-
+ax.set_ylim(0, 3)
 ax.legend()
+
 st.pyplot(fig)
 
 # ----------------------------
 # Tasks
 # ----------------------------
+
 st.markdown("### Do the following tasks")
 st.markdown("""
-- Stimulate the cells (Set TLR Activation to 0.2)
+- Press **Stimulate (LPS)**  
     - Why does IkB decrease then increase?
     - Why does TNF increase in line with nuclear NFKB, but delayed?
     - Why does nuclear NFkB appear to decrease after an initial burst?
@@ -160,6 +158,3 @@ st.markdown("""
 - Reset the NFkB phosphorylation inhibitor and start increasing the ikba phosphorylation inhibitor
     - How does this differ to the NFkB phosphorylation inhibitor
 """)
-
-
-

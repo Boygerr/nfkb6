@@ -135,16 +135,20 @@ with c2:
 # ── DRUGS ─────────────────────────────────────────────────────────────────────
 st.markdown('<div class="section-label">Experimental Drugs</div>', unsafe_allow_html=True)
 
-brake_blocker = st.slider(
-    "Chemically stop Brake degredation (%)",
-    0.0, 1.0, 0.0, 0.01,
+brake_blocker_pct = st.slider(
+    "Chemically stop Brake degradation (%)",
+    0, 100, 0, 1,
     help="Blocks IKK-mediated phosphorylation of IkBa — prevents the Brake from being degraded"
 )
-alarm_blocker = st.slider(
+alarm_blocker_pct = st.slider(
     "Chemically stop Alarm from ringing (%)",
-    0.0, 1.0, 0.0, 0.01,
+    0, 100, 0, 1,
     help="Blocks NF-kB translocation into the nucleus without affecting IkBa"
 )
+
+# Convert to 0–1 for use in the model
+brake_blocker = brake_blocker_pct / 100
+alarm_blocker = alarm_blocker_pct / 100
 
 show_alarm = True
 show_brake = True
@@ -269,7 +273,3 @@ with st.expander("📖  Glossary", expanded=False):
     Kinase complex activated downstream of TLR (Toll-like receptor) when bacteria are detected. Phosphorylates IκBα, marking it for degradation.
     </div>
     """, unsafe_allow_html=True)
-
-
-
-

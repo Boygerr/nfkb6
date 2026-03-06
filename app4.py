@@ -3,7 +3,7 @@ import numpy as np
 from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
 
-st.title("NF-κB – IκBα – TNF Dynamics During TLR Signalling")
+st.title("NF-κB – IκBα Dynamics During TLR Signalling")
 
 # ----------------------------
 # Pretreatment
@@ -12,7 +12,7 @@ st.title("NF-κB – IκBα – TNF Dynamics During TLR Signalling")
 st.sidebar.header("Pretreatment")
 
 nfkb_inhib = st.sidebar.slider(
-    "NF-κB Transport Inhibitor)",
+    "NF-κB Transport Inhibitor",
     0.0, 1.0, 0.0
 )
 
@@ -48,7 +48,7 @@ st.sidebar.header("Graph Display")
 
 show_nfkb = st.sidebar.checkbox("Show Nuclear NF-κB", value=True)
 show_ikba = st.sidebar.checkbox("Show IκBα", value=True)
-show_tnf = st.sidebar.checkbox("Show TNF Gene Expression", value=True)
+
 
 # ----------------------------
 # Parameters
@@ -128,9 +128,6 @@ if show_nfkb:
 if show_ikba:
     ax.plot(sol.t, sol.y[3], label="IκBα")
 
-if show_tnf:
-    ax.plot(sol.t, sol.y[4], label="TNF Gene Expression")
-
 ax.set_xlabel("Time")
 ax.set_ylabel("Concentration / Activity")
 ax.set_ylim(0, 3)
@@ -156,6 +153,7 @@ Question: What should inhibiting ikba and NFkB phosphorylation acomplish?
 - Reset the NFkB phosphorylation inhibitor and start increasing the ikba phosphorylation inhibitor
     - How does this differ to the NFkB phosphorylation inhibitor
 """)
+
 
 
 

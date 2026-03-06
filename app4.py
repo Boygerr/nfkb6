@@ -207,7 +207,7 @@ def get_narrative():
             "The Brake is gone, yet no response fires. The two steps are independent."
     if Nn_end > 0.15:
         return "#1c1a0e", "⚡  Alarm activated, Brake rebuilding.", \
-            "The brake has been broken, releasing the alarm which can ring. " \
+            "The brake has been degraded, releasing the alarm which can ring. " \
             "The cell is rebuilding the Brake to limit the response."
     return "#1e293b", "🔬  Processing threat...", \
         "Watch how the Brake and Alarm Signal interact over time."
@@ -273,3 +273,4 @@ with st.expander("📖  Glossary", expanded=False):
     Kinase complex activated downstream of TLR (Toll-like receptor) when bacteria are detected. Phosphorylates IκBα, marking it for degradation.
     </div>
     """, unsafe_allow_html=True)
+

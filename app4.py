@@ -152,6 +152,10 @@ alarm_blocker = st.slider(
     help="Blocks NF-kB translocation into the nucleus without affecting IkBa"
 )
 
+# ── DISPLAY TOGGLES ───────────────────────────────────────────────────────────
+st.markdown('<div class="section-label">Show on graph</div>', unsafe_allow_html=True)
+
+
 # ── ODE MODEL ─────────────────────────────────────────────────────────────────
 tlr_strength = 0.2 if st.session_state.stimulated else 0.0
 
@@ -226,6 +230,15 @@ ax.set_facecolor("#111827")
 ax.grid(color="#1e293b", linestyle="--", linewidth=0.7, alpha=1.0)
 ax.set_axisbelow(True)
 
+plotted = False
+if show_alarm:
+    ax.plot(sol.t, sol.y[1], color="#ef4444", linewidth=2.2,
+            label="Alarm Signal (NF-κB)", solid_capstyle="round")
+    plotted = True
+if show_brake:
+    ax.plot(sol.t, sol.y[3], color="#3b82f6", linewidth=2.2,
+            label="Brake (IκBα)", solid_capstyle="round")
+    plotted = True
 
 if st.session_state.stimulated:
     ax.axvspan(0, 50, alpha=0.03, color="#ef4444")
@@ -263,4 +276,3 @@ with st.expander("📖  Glossary", expanded=False):
     Kinase complex activated downstream of TLR (Toll-like receptor) when bacteria are detected. Phosphorylates IκBα, marking it for degradation.
     </div>
     """, unsafe_allow_html=True)
-

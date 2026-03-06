@@ -80,12 +80,6 @@ html, body, [class*="css"] {
     color: #94a3b8 !important;
 }
 
-/* Checkbox label sizing */
-.stCheckbox label {
-    font-size: 0.82rem !important;
-    color: #94a3b8 !important;
-}
-
 /* Narrative card */
 .narrative {
     border-radius: 10px;
@@ -152,9 +146,8 @@ alarm_blocker = st.slider(
     help="Blocks NF-kB translocation into the nucleus without affecting IkBa"
 )
 
-# ── DISPLAY TOGGLES ───────────────────────────────────────────────────────────
-st.markdown('<div class="section-label">Show on graph</div>', unsafe_allow_html=True)
-
+show_alarm = True
+show_brake = True
 
 # ── ODE MODEL ─────────────────────────────────────────────────────────────────
 tlr_strength = 0.2 if st.session_state.stimulated else 0.0

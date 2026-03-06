@@ -201,15 +201,15 @@ def get_narrative():
     if not st.session_state.stimulated:
         return "😴", "Cell is at rest.", \
                "The Brake (IkBa) is holding the Alarm Signal (NF-kB) in the cytoplasm. No threat detected — everything is quiet."
-    if brake_blocker > 0.6 and Nn_end > 0.2:
-        return "⚠️", "Brake removed — Alarm stays high!", \
-               "With no Brake, the Alarm Signal cannot be switched off. The Inflammatory Signal keeps rising. This mimics what happens in chronic inflammation diseases like rheumatoid arthritis."
+    if brake_blocker > 0.6:
+        return "🛑", "Brake locked — Alarm cannot activate.", \
+               "The IkBa phosphorylation inhibitor prevents the Brake from being broken down. With the Brake still intact, NF-kB stays trapped in the cytoplasm and cannot reach the nucleus — no immune response is triggered."
     if alarm_blocker > 0.6:
-        return "🚫", "Alarm blocked at the gate.", \
-               "The Alarm Signal is prevented from reaching the nucleus entirely. The Inflammatory Signal stays flat — even with bacteria present. The cell cannot mount a defence."
+        return "🚫", "Brake released, but Alarm is blocked at the gate.", \
+               "Bacteria caused the Brake to break down as normal — but the Alarm Signal is blocked from entering the nucleus. The Brake is gone yet no response fires. This shows the two steps are independent."
     if Nn_end > 0.3 and I_end > 0.4:
         return "⚡", "Alarm activated — Brake rebuilding.", \
-               "Bacteria detected! The Alarm Signal flooded the nucleus. But the cell also started rebuilding the Brake to avoid over-reacting — a classic negative feedback loop."
+               "Bacteria detected! IKK phosphorylated the Brake, releasing the Alarm Signal into the nucleus. The cell is now rebuilding the Brake via negative feedback to avoid over-reacting."
     return "🔬", "Threat response underway.", \
            "The cell is processing the bacterial signal. Watch how the Brake and Alarm Signal interact over time."
 
@@ -233,17 +233,17 @@ STEPS = [
     },
     {
         "badge": "Step 3 — Drug 1",
-        "title": "Block the Brake",
-        "instruction": "With bacteria present, move the Brake Blocker slider to maximum. This mimics a drug that prevents the braking system from working.",
-        "hypothesis": "Predict: will the Alarm stay high, go higher, or behave unexpectedly?",
-        "hint": "Think about what the Brake normally does to the Alarm Signal."
+        "title": "Block the Brake's Release",
+        "instruction": "With bacteria present, move the Brake Blocker slider to maximum. This drug blocks IkBa phosphorylation — meaning the Brake cannot be broken down by bacteria.",
+        "hypothesis": "Predict: if the Brake can't be released, can the Alarm Signal reach the nucleus?",
+        "hint": "Remember — NF-kB is only freed when IkBa is degraded. Block that step and what happens?"
     },
     {
         "badge": "Step 4 — Drug 2",
-        "title": "Block the Alarm",
-        "instruction": "Reset the Brake Blocker to zero. Now increase the Alarm Blocker. This blocks the alarm from entering the nucleus.",
-        "hypothesis": "How does blocking the Alarm differ from blocking the Brake?",
-        "hint": "Compare the Inflammatory Signal between this experiment and the last."
+        "title": "Block the Alarm Directly",
+        "instruction": "Reset the Brake Blocker to zero. Now increase the Alarm Blocker. This drug blocks NF-kB from translocating into the nucleus — but does not affect IkBa.",
+        "hypothesis": "The Brake still gets released here. How does the outcome differ from Step 3?",
+        "hint": "Look at the Brake curve — it drops just like in Step 2. But what does the Alarm Signal do?"
     },
 ]
 
@@ -323,12 +323,12 @@ with right_col:
     if st.session_state.stimulated:
         ax.axvspan(0, 50, alpha=0.04, color="#ef4444")
         ax.axvline(x=0, color="#ef4444", linewidth=1.2, linestyle=":", alpha=0.5)
-        ax.text(1, 2.7, "Bacteria introduced", color="#ef444488",
+        ax.text(1, 1.38, "Bacteria introduced", color="#ef444488",
                 fontsize=9, fontstyle="italic")
 
     ax.set_xlabel("Time (minutes)", color="#94a3b8", fontsize=11)
     ax.set_ylabel("Activity Level", color="#94a3b8", fontsize=11)
-    ax.set_ylim(0, 3)
+    ax.set_ylim(0, 1.5)
     ax.set_xlim(0, 50)
     ax.tick_params(colors="#64748b", labelsize=10)
     for spine in ax.spines.values():

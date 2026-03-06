@@ -104,23 +104,7 @@ section[data-testid="stSidebar"] .stMarkdown p {
     transition: all 0.2s !important;
 }
 
-div[data-testid="stMetric"] {
-    background: #1a2332;
-    border: 1px solid #2d3f55;
-    border-radius: 12px;
-    padding: 12px 16px;
-}
 
-div[data-testid="stMetric"] label {
-    color: #94a3b8 !important;
-    font-family: 'DM Mono', monospace !important;
-    font-size: 11px !important;
-}
-
-div[data-testid="stMetric"] div[data-testid="stMetricValue"] {
-    color: #f1f5f9 !important;
-    font-family: 'DM Mono', monospace !important;
-}
 </style>
 """, unsafe_allow_html=True)
 
@@ -170,7 +154,6 @@ with st.sidebar:
     st.markdown("**GRAPH DISPLAY**")
     show_alarm     = st.checkbox("Show Alarm Signal (NF-kB)", value=True)
     show_brake     = st.checkbox("Show Brake (IkBa)", value=True)
-    show_inflam    = st.checkbox("Show Inflammatory Signal (TNF)", value=False)
 
     st.markdown("---")
     st.markdown("**EXPERIMENT PROGRESS**")
@@ -212,7 +195,6 @@ sol = solve_ivp(nfkb_model, [0, 50], [1.0, 0.0, 0.0, 1.0, 0.0], t_eval=t_eval)
 
 Nn_end  = float(sol.y[1, -1])
 I_end   = float(sol.y[3, -1])
-TNF_end = float(sol.y[4, -1])
 
 # ── Narrative logic ───────────────────────────────────────────────────────────
 def get_narrative():
@@ -315,14 +297,7 @@ with left_col:
     </div>
     """, unsafe_allow_html=True)
 
-    # Metrics
-    m1, m2, m3 = st.columns(3)
-    with m1:
-        st.metric("🔔 Alarm", f"{Nn_end:.2f}")
-    with m2:
-        st.metric("🛑 Brake", f"{I_end:.2f}")
-    with m3:
-        st.metric("🔥 Inflam.", f"{TNF_end:.2f}")
+
 
 # ── RIGHT: Chart ──────────────────────────────────────────────────────────────
 with right_col:
@@ -342,10 +317,6 @@ with right_col:
     if show_brake:
         ax.plot(sol.t, sol.y[3], color="#3b82f6", linewidth=2.5,
                 label="Brake (IkBa)", solid_capstyle="round")
-        plotted = True
-    if show_inflam:
-        ax.plot(sol.t, sol.y[4], color="#f59e0b", linewidth=2.5,
-                label="Inflammatory Signal (TNF)", solid_capstyle="round")
         plotted = True
 
     # Shade region when stimulated
@@ -390,13 +361,6 @@ with right_col:
           <div style="font-size:0.85rem;font-weight:600;color:#f1f5f9;">"The Brake"</div>
           <div style="font-size:0.78rem;color:#64748b;max-width:180px;line-height:1.4;">
             Inhibitory protein that traps NF-kB in the cytoplasm, preventing over-activation
-          </div>
-        </div>
-        <div>
-          <div style="font-size:10px;color:#60a5fa;font-family:'DM Mono',monospace;">TNF-a</div>
-          <div style="font-size:0.85rem;font-weight:600;color:#f1f5f9;">"Inflammatory Signal"</div>
-          <div style="font-size:0.78rem;color:#64748b;max-width:180px;line-height:1.4;">
-            Cytokine secreted by the cell to recruit other immune cells to the infection site
           </div>
         </div>
       </div>

@@ -199,7 +199,7 @@ def get_narrative():
             "The Brake (IκBα) is blocking the Alarm Signal (NF-κB)"
     if brake_blocker > 0.5:
         return "#1a1a2e", "🛑  Brake locked — Alarm cannot activate.", \
-            "The 'Brake protector' prevents the Brake from being degraded. " \
+            "This drug prevents the Brake from being degraded. " \
             "NF-κB stays trapped, no immune response"
     if alarm_blocker > 0.5:
         return "#1a1a2e", "🚫  Brake released, but Alarm can't ring.", \
@@ -273,4 +273,5 @@ with st.expander("📖  Glossary", expanded=False):
     Kinase complex activated downstream of TLR (Toll-like receptor) when bacteria are detected. Phosphorylates IκBα, marking it for degradation.
     </div>
     """, unsafe_allow_html=True)
+
 

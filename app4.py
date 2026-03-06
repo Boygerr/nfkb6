@@ -2,185 +2,186 @@ import streamlit as st
 import numpy as np
 from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
 
 # ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="Cell Alarm System",
     page_icon="🦠",
-    layout="wide"
+    layout="centered"
 )
 
-# ── Custom CSS ────────────────────────────────────────────────────────────────
+# ── CSS ───────────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,600;1,400&family=DM+Mono:wght@400;500&display=swap');
 
 html, body, [class*="css"] {
     font-family: 'DM Sans', sans-serif;
 }
 
 .stApp {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    background: #0f172a;
     color: #f1f5f9;
 }
 
-/* Header banner */
-.header-banner {
-    background: linear-gradient(90deg, #1e3a5f, #0f4c75);
-    border: 1px solid #1e40af55;
-    border-radius: 14px;
-    padding: 20px 28px;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
+/* Hide default streamlit chrome */
+#MainMenu, footer, header { visibility: hidden; }
+
+/* Remove top padding on mobile */
+.block-container {
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+    max-width: 560px !important;
 }
 
-/* Experiment step card */
-.step-card {
-    background: linear-gradient(135deg, #1e3a5f22, #1e2d4f33);
-    border: 1px solid #2563eb44;
-    border-radius: 12px;
-    padding: 16px 18px;
+/* Title */
+.app-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #f1f5f9;
+    letter-spacing: -0.3px;
+    margin-bottom: 2px;
+}
+.app-subtitle {
+    font-size: 0.7rem;
+    color: #475569;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     margin-bottom: 16px;
 }
 
-/* Hypothesis box */
-.hypothesis-box {
-    background: #0f172a;
-    border-left: 3px solid #f59e0b;
-    border-radius: 0 8px 8px 0;
-    padding: 10px 14px;
-    margin-top: 10px;
+/* Section labels */
+.section-label {
+    font-size: 0.65rem;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #475569;
+    margin-bottom: 6px;
+    margin-top: 14px;
+}
+
+/* Stimulus buttons */
+.stButton > button {
+    border-radius: 10px !important;
+    font-family: 'DM Sans', sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 0.9rem !important;
+    padding: 10px 0 !important;
+    transition: all 0.15s !important;
+    border: none !important;
+    width: 100% !important;
+}
+
+/* Slider label sizing */
+.stSlider label {
+    font-size: 0.82rem !important;
+    color: #94a3b8 !important;
+}
+
+/* Checkbox label sizing */
+.stCheckbox label {
+    font-size: 0.82rem !important;
+    color: #94a3b8 !important;
 }
 
 /* Narrative card */
-.narrative-card {
-    background: linear-gradient(135deg, #1e293b, #162032);
-    border: 1px solid #2d3f55;
-    border-radius: 14px;
-    padding: 16px 20px;
-    margin-bottom: 16px;
+.narrative {
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin: 12px 0 4px 0;
+    font-size: 0.82rem;
+    line-height: 1.55;
+    color: #cbd5e1;
 }
 
-/* Glossary row */
-.glossary-row {
+/* Divider */
+.divider {
+    border: none;
+    border-top: 1px solid #1e293b;
+    margin: 14px 0;
+}
+
+/* Glossary */
+.glossary {
     background: #0f172a;
-    border: 1px solid #1e3a5f;
-    border-radius: 12px;
-    padding: 14px 18px;
-    margin-top: 16px;
+    border: 1px solid #1e293b;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-top: 8px;
+    font-size: 0.75rem;
+    color: #475569;
+    line-height: 1.6;
 }
-
-/* Metric card */
-.metric-card {
-    background: #1a2332;
-    border: 1px solid #2d3f55;
-    border-radius: 12px;
-    padding: 14px 16px;
-    text-align: center;
-}
-
-/* Sidebar styling */
-section[data-testid="stSidebar"] {
-    background: #0f172a !important;
-    border-right: 1px solid #1e293b;
-}
-
-section[data-testid="stSidebar"] .stMarkdown p {
-    color: #94a3b8;
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-}
-
-/* Buttons */
-.stButton > button {
-    border-radius: 8px !important;
-    font-family: 'DM Sans', sans-serif !important;
-    font-weight: 600 !important;
-    transition: all 0.2s !important;
-}
-
-
+.glossary b { color: #64748b; }
+.glossary span { color: #94a3b8; font-family: 'DM Mono', monospace; font-size: 0.7rem; }
 </style>
 """, unsafe_allow_html=True)
 
 # ── Session state ─────────────────────────────────────────────────────────────
 if "stimulated" not in st.session_state:
     st.session_state.stimulated = False
-if "step" not in st.session_state:
-    st.session_state.step = 0
 
-# ── Sidebar controls ──────────────────────────────────────────────────────────
-with st.sidebar:
-    st.markdown("### 🦠 Cell Alarm System")
-    st.markdown("---")
+# ── Title ─────────────────────────────────────────────────────────────────────
+st.markdown('<div class="app-title">🦠 Cell Alarm System</div>', unsafe_allow_html=True)
+st.markdown('<div class="app-subtitle">NF-κB · IκBα signalling simulator</div>', unsafe_allow_html=True)
 
-    st.markdown("**STIMULUS**")
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("🦠 Introduce\nBacteria", use_container_width=True):
-            st.session_state.stimulated = True
-            if st.session_state.step == 0:
-                st.session_state.step = 1
-    with col2:
-        if st.button("↺ Reset\nAll", use_container_width=True):
-            st.session_state.stimulated = False
-            st.session_state.step = 0
+# ── STIMULUS ──────────────────────────────────────────────────────────────────
+st.markdown('<div class="section-label">Stimulus</div>', unsafe_allow_html=True)
 
-    st.markdown("---")
-    st.markdown("**EXPERIMENTAL DRUGS**")
+c1, c2 = st.columns(2)
+with c1:
+    if st.button("🦠  Introduce Bacteria", use_container_width=True):
+        st.session_state.stimulated = True
+with c2:
+    if st.button("↺  Reset", use_container_width=True):
+        st.session_state.stimulated = False
 
-    brake_blocker = st.slider(
-        "Brake Blocker (IkBa inhibitor)",
-        0.0, 1.0, 0.0, 0.01,
-        help="Prevents IkBa (the Brake) from being rebuilt after activation"
-    )
-    alarm_blocker = st.slider(
-        "Alarm Blocker (NF-kB inhibitor)",
-        0.0, 1.0, 0.0, 0.01,
-        help="Prevents NF-kB (the Alarm Signal) from entering the nucleus"
-    )
+# ── DRUGS ─────────────────────────────────────────────────────────────────────
+st.markdown('<div class="section-label">Experimental Drugs</div>', unsafe_allow_html=True)
 
-    if brake_blocker > 0.05 and st.session_state.step < 2:
-        st.session_state.step = 2
-    if alarm_blocker > 0.05 and st.session_state.step < 3:
-        st.session_state.step = 3
+brake_blocker = st.slider(
+    "IκBα phosphorylation inhibitor  (Brake Blocker)",
+    0.0, 1.0, 0.0, 0.01,
+    help="Blocks IKK-mediated phosphorylation of IkBa — prevents the Brake from being degraded"
+)
+alarm_blocker = st.slider(
+    "NF-κB nuclear transport inhibitor  (Alarm Blocker)",
+    0.0, 1.0, 0.0, 0.01,
+    help="Blocks NF-kB translocation into the nucleus without affecting IkBa"
+)
 
-    st.markdown("---")
-    st.markdown("**GRAPH DISPLAY**")
-    show_alarm     = st.checkbox("Show Alarm Signal (NF-kB)", value=True)
-    show_brake     = st.checkbox("Show Brake (IkBa)", value=True)
+# ── DISPLAY TOGGLES ───────────────────────────────────────────────────────────
+st.markdown('<div class="section-label">Show on graph</div>', unsafe_allow_html=True)
 
-    st.markdown("---")
-    st.markdown("**EXPERIMENT PROGRESS**")
-    step_labels = ["Baseline", "Bacteria", "Brake Drug", "Alarm Drug"]
-    for i, label in enumerate(step_labels):
-        icon = "✅" if i < st.session_state.step else ("▶️" if i == st.session_state.step else "⬜")
-        st.markdown(f"{icon} Step {i+1}: {label}")
+tc1, tc2 = st.columns(2)
+with tc1:
+    show_alarm = st.checkbox("Alarm Signal  (NF-κB)", value=True)
+with tc2:
+    show_brake = st.checkbox("Brake  (IκBα)", value=True)
 
-# ── ODE model ─────────────────────────────────────────────────────────────────
+# ── ODE MODEL ─────────────────────────────────────────────────────────────────
 tlr_strength = 0.2 if st.session_state.stimulated else 0.0
 
 def nfkb_model(t, y):
     Nc, Nn, Im, I, TNF = y
     IKK = tlr_strength
-    k_import = 1.0; k_export = 0.5; k_deg_I = 1.5
-    k_syn_I = 0.1;  k_decay_I = 0.1
-    k_tnf = 1.5;    k_tnf_decay = 0.3
-    k_tx = 0.2;     k_mdeg = 0.05; k_tl = 0.1
+    k_import = 1.0;  k_export = 0.5;  k_deg_I = 1.5
+    k_syn_I  = 0.1;  k_decay_I = 0.1
+    k_tnf    = 1.5;  k_tnf_decay = 0.3
+    k_tx     = 0.2;  k_mdeg = 0.05;  k_tl = 0.1
 
+    # IkBa phosphorylation/degradation driven by IKK; brake_blocker inhibits this step
     tlr_deg = k_deg_I * IKK * I * (1 - brake_blocker)
     dIm = k_tx * Nn * (IKK / (IKK + 1e-6)) - k_mdeg * Im
     dI  = k_syn_I - k_decay_I * I - tlr_deg + k_tl * Im
 
     if IKK > 0:
-        degraded_fraction  = tlr_deg / (k_deg_I * IKK * I + 1e-6)
-        effective_import   = k_import * Nc * degraded_fraction * (1 - alarm_blocker)
-        export_N           = k_export * Nn * (1 + I)
+        degraded_fraction = tlr_deg / (k_deg_I * IKK * I + 1e-6)
+        # alarm_blocker prevents nuclear import regardless of IkBa state
+        effective_import  = k_import * Nc * degraded_fraction * (1 - alarm_blocker)
+        export_N          = k_export * Nn * (1 + I)
     else:
         effective_import = 0.0
         export_N         = 0.0
@@ -190,179 +191,93 @@ def nfkb_model(t, y):
     dNn  =  effective_import - export_N
     return [dNc, dNn, dIm, dI, dTNF]
 
-t_eval = np.linspace(0, 50, 1000)
-sol = solve_ivp(nfkb_model, [0, 50], [1.0, 0.0, 0.0, 1.0, 0.0], t_eval=t_eval)
+sol = solve_ivp(
+    nfkb_model, [0, 50],
+    [1.0, 0.0, 0.0, 1.0, 0.0],
+    t_eval=np.linspace(0, 50, 1000)
+)
 
-Nn_end  = float(sol.y[1, -1])
-I_end   = float(sol.y[3, -1])
+Nn_end = float(sol.y[1, -1])
+I_end  = float(sol.y[3, -1])
 
-# ── Narrative logic ───────────────────────────────────────────────────────────
+# ── NARRATIVE ─────────────────────────────────────────────────────────────────
 def get_narrative():
     if not st.session_state.stimulated:
-        return "😴", "Cell is at rest.", \
-               "The Brake (IkBa) is holding the Alarm Signal (NF-kB) in the cytoplasm. No threat detected — everything is quiet."
-    if brake_blocker > 0.6:
-        return "🛑", "Brake locked — Alarm cannot activate.", \
-               "The IkBa phosphorylation inhibitor prevents the Brake from being broken down. With the Brake still intact, NF-kB stays trapped in the cytoplasm and cannot reach the nucleus — no immune response is triggered."
-    if alarm_blocker > 0.6:
-        return "🚫", "Brake released, but Alarm is blocked at the gate.", \
-               "Bacteria caused the Brake to break down as normal — but the Alarm Signal is blocked from entering the nucleus. The Brake is gone yet no response fires. This shows the two steps are independent."
-    if Nn_end > 0.3 and I_end > 0.4:
-        return "⚡", "Alarm activated — Brake rebuilding.", \
-               "Bacteria detected! IKK phosphorylated the Brake, releasing the Alarm Signal into the nucleus. The cell is now rebuilding the Brake via negative feedback to avoid over-reacting."
-    return "🔬", "Threat response underway.", \
-           "The cell is processing the bacterial signal. Watch how the Brake and Alarm Signal interact over time."
+        return "#1e293b", "😴  Cell at rest — no threat detected.", \
+            "The Brake (IκBα) is holding the Alarm Signal (NF-κB) in the cytoplasm."
+    if brake_blocker > 0.5:
+        return "#1a1a2e", "🛑  Brake locked — Alarm cannot activate.", \
+            "The IκBα phosphorylation inhibitor prevents the Brake from being degraded. " \
+            "NF-κB stays trapped in the cytoplasm — no immune response fires."
+    if alarm_blocker > 0.5:
+        return "#1a1a2e", "🚫  Brake released, but Alarm blocked at the nucleus.", \
+            "Bacteria degraded the Brake as normal — but NF-κB cannot translocate. " \
+            "The Brake is gone, yet no response fires. The two steps are independent."
+    if Nn_end > 0.15:
+        return "#1c1a0e", "⚡  Alarm activated — Brake rebuilding.", \
+            "IKK phosphorylated IκBα, releasing NF-κB into the nucleus. " \
+            "The cell is rebuilding the Brake via negative feedback to limit the response."
+    return "#1e293b", "🔬  Processing threat...", \
+        "Watch how the Brake and Alarm Signal interact over time."
 
-emoji, headline, body = get_narrative()
+bg, headline, body = get_narrative()
+st.markdown(
+    f'<div class="narrative" style="background:{bg};">'
+    f'<b style="color:#f1f5f9;">{headline}</b><br>{body}</div>',
+    unsafe_allow_html=True
+)
 
-# ── Experiment steps ──────────────────────────────────────────────────────────
-STEPS = [
-    {
-        "badge": "Step 1 — Baseline",
-        "title": "No Threat",
-        "instruction": "This is the resting cell. No bacteria present. Observe the default state of both signals.",
-        "hypothesis": "Predict: what happens to the Alarm Signal if bacteria are introduced?",
-        "hint": "Look at the Brake — it starts high. What role might it play?"
-    },
-    {
-        "badge": "Step 2 — Stimulate",
-        "title": "Introduce a Threat",
-        "instruction": "Press 'Introduce Bacteria' in the sidebar. Watch what happens to both signals over time.",
-        "hypothesis": "Why does the Alarm Signal rise, then fall back down?",
-        "hint": "Notice the Brake drops first, then recovers. Could these be linked?"
-    },
-    {
-        "badge": "Step 3 — Drug 1",
-        "title": "Block the Brake's Release",
-        "instruction": "With bacteria present, move the Brake Blocker slider to maximum. This drug blocks IkBa phosphorylation — meaning the Brake cannot be broken down by bacteria.",
-        "hypothesis": "Predict: if the Brake can't be released, can the Alarm Signal reach the nucleus?",
-        "hint": "Remember — NF-kB is only freed when IkBa is degraded. Block that step and what happens?"
-    },
-    {
-        "badge": "Step 4 — Drug 2",
-        "title": "Block the Alarm Directly",
-        "instruction": "Reset the Brake Blocker to zero. Now increase the Alarm Blocker. This drug blocks NF-kB from translocating into the nucleus — but does not affect IkBa.",
-        "hypothesis": "The Brake still gets released here. How does the outcome differ from Step 3?",
-        "hint": "Look at the Brake curve — it drops just like in Step 2. But what does the Alarm Signal do?"
-    },
-]
+# ── GRAPH ─────────────────────────────────────────────────────────────────────
+fig, ax = plt.subplots(figsize=(5.5, 3.2))
+fig.patch.set_facecolor("#111827")
+ax.set_facecolor("#111827")
 
-step_data = STEPS[st.session_state.step]
+ax.grid(color="#1e293b", linestyle="--", linewidth=0.7, alpha=1.0)
+ax.set_axisbelow(True)
 
-# ── Layout ────────────────────────────────────────────────────────────────────
-st.markdown("""
-<div class="header-banner">
-  <span style="font-size:2rem;">🦠</span>
-  <div>
-    <div style="font-size:1.5rem;font-weight:700;letter-spacing:-0.5px;">Cell Alarm System</div>
-    <div style="font-size:0.75rem;color:#94a3b8;font-family:'DM Mono',monospace;letter-spacing:0.06em;">
-      HOW YOUR CELLS DETECT AND RESPOND TO BACTERIA
-    </div>
-  </div>
-</div>
-""", unsafe_allow_html=True)
+plotted = False
+if show_alarm:
+    ax.plot(sol.t, sol.y[1], color="#ef4444", linewidth=2.2,
+            label="Alarm Signal (NF-κB)", solid_capstyle="round")
+    plotted = True
+if show_brake:
+    ax.plot(sol.t, sol.y[3], color="#3b82f6", linewidth=2.2,
+            label="Brake (IκBα)", solid_capstyle="round")
+    plotted = True
 
-left_col, right_col = st.columns([1, 1.8], gap="large")
+if st.session_state.stimulated:
+    ax.axvspan(0, 50, alpha=0.03, color="#ef4444")
+    ax.text(1, 1.41, "⬤ bacteria present", color="#ef444466",
+            fontsize=7.5, fontstyle="italic")
 
-# ── LEFT: Experiment guide ────────────────────────────────────────────────────
-with left_col:
-    st.markdown(f"""
-    <div class="step-card">
-      <div style="font-size:11px;color:#60a5fa;font-family:'DM Mono',monospace;letter-spacing:0.08em;margin-bottom:6px;">
-        {step_data['badge']}
-      </div>
-      <div style="font-size:1.05rem;font-weight:600;color:#f1f5f9;margin-bottom:8px;">
-        {step_data['title']}
-      </div>
-      <div style="font-size:0.85rem;color:#cbd5e1;line-height:1.6;margin-bottom:8px;">
-        {step_data['instruction']}
-      </div>
-      <div class="hypothesis-box">
-        <div style="font-size:10px;color:#f59e0b;font-family:'DM Mono',monospace;margin-bottom:3px;">HYPOTHESIS</div>
-        <div style="font-size:0.82rem;color:#fef3c7;line-height:1.5;">{step_data['hypothesis']}</div>
-      </div>
-      <div style="font-size:0.78rem;color:#64748b;margin-top:10px;font-style:italic;">
-        💡 {step_data['hint']}
-      </div>
-    </div>
-    """, unsafe_allow_html=True)
+ax.set_xlabel("Time (minutes)", color="#64748b", fontsize=9)
+ax.set_ylabel("Activity Level", color="#64748b", fontsize=9)
+ax.set_ylim(0, 1.5)
+ax.set_xlim(0, 50)
+ax.tick_params(colors="#475569", labelsize=8)
+for spine in ax.spines.values():
+    spine.set_edgecolor("#1e293b")
 
-    # Narrative card
-    bg = "#3b1111" if st.session_state.stimulated else "#11233b"
-    st.markdown(f"""
-    <div class="narrative-card" style="background:{bg};">
-      <div style="font-size:1.5rem;margin-bottom:6px;">{emoji}</div>
-      <div style="font-size:1rem;font-weight:600;color:#f1f5f9;margin-bottom:6px;">{headline}</div>
-      <div style="font-size:0.84rem;color:#94a3b8;line-height:1.6;">{body}</div>
-    </div>
-    """, unsafe_allow_html=True)
+if plotted:
+    ax.legend(
+        facecolor="#0f172a", edgecolor="#1e293b",
+        labelcolor="#94a3b8", fontsize=8,
+        loc="upper right", framealpha=1
+    )
 
+plt.tight_layout(pad=0.8)
+st.pyplot(fig, use_container_width=True)
+plt.close()
 
-
-# ── RIGHT: Chart ──────────────────────────────────────────────────────────────
-with right_col:
-    fig, ax = plt.subplots(figsize=(8, 5))
-    fig.patch.set_facecolor("#1a2332")
-    ax.set_facecolor("#111827")
-
-    # Grid
-    ax.grid(color="#2d3f55", linestyle="--", linewidth=0.6, alpha=0.8)
-    ax.set_axisbelow(True)
-
-    plotted = False
-    if show_alarm:
-        ax.plot(sol.t, sol.y[1], color="#ef4444", linewidth=2.5,
-                label="Alarm Signal (NF-kB)", solid_capstyle="round")
-        plotted = True
-    if show_brake:
-        ax.plot(sol.t, sol.y[3], color="#3b82f6", linewidth=2.5,
-                label="Brake (IkBa)", solid_capstyle="round")
-        plotted = True
-
-    # Shade region when stimulated
-    if st.session_state.stimulated:
-        ax.axvspan(0, 50, alpha=0.04, color="#ef4444")
-        ax.axvline(x=0, color="#ef4444", linewidth=1.2, linestyle=":", alpha=0.5)
-        ax.text(1, 1.38, "Bacteria introduced", color="#ef444488",
-                fontsize=9, fontstyle="italic")
-
-    ax.set_xlabel("Time (minutes)", color="#94a3b8", fontsize=11)
-    ax.set_ylabel("Activity Level", color="#94a3b8", fontsize=11)
-    ax.set_ylim(0, 1.5)
-    ax.set_xlim(0, 50)
-    ax.tick_params(colors="#64748b", labelsize=10)
-    for spine in ax.spines.values():
-        spine.set_edgecolor("#2d3f55")
-
-    if plotted:
-        legend = ax.legend(
-            facecolor="#0f172a", edgecolor="#2d3f55",
-            labelcolor="#e2e8f0", fontsize=10,
-            loc="upper right"
-        )
-
-    plt.tight_layout()
-    st.pyplot(fig)
-    plt.close()
-
-    # Glossary strip
+# ── GLOSSARY (collapsible) ────────────────────────────────────────────────────
+with st.expander("📖  Glossary", expanded=False):
     st.markdown("""
-    <div class="glossary-row">
-      <div style="display:flex;gap:32px;flex-wrap:wrap;">
-        <div>
-          <div style="font-size:10px;color:#60a5fa;font-family:'DM Mono',monospace;">NF-kB</div>
-          <div style="font-size:0.85rem;font-weight:600;color:#f1f5f9;">"Alarm Signal"</div>
-          <div style="font-size:0.78rem;color:#64748b;max-width:180px;line-height:1.4;">
-            Transcription factor that activates immune genes when it enters the nucleus
-          </div>
-        </div>
-        <div>
-          <div style="font-size:10px;color:#60a5fa;font-family:'DM Mono',monospace;">IkBa</div>
-          <div style="font-size:0.85rem;font-weight:600;color:#f1f5f9;">"The Brake"</div>
-          <div style="font-size:0.78rem;color:#64748b;max-width:180px;line-height:1.4;">
-            Inhibitory protein that traps NF-kB in the cytoplasm, preventing over-activation
-          </div>
-        </div>
-      </div>
+    <div class="glossary">
+    <span>NF-κB</span> &nbsp;·&nbsp; <b>Alarm Signal</b><br>
+    Transcription factor held inactive in the cytoplasm by IκBα. When freed, it enters the nucleus and switches on immune response genes.<br><br>
+    <span>IκBα</span> &nbsp;·&nbsp; <b>The Brake</b><br>
+    Inhibitory protein that binds and sequesters NF-κB. Degraded by IKK kinase (activated by TLR signalling) to release NF-κB. Rebuilt via negative feedback.<br><br>
+    <span>IKK</span> &nbsp;·&nbsp; <b>The Trigger</b><br>
+    Kinase complex activated downstream of TLR (Toll-like receptor) when bacteria are detected. Phosphorylates IκBα, marking it for degradation.
     </div>
     """, unsafe_allow_html=True)

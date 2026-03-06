@@ -220,7 +220,7 @@ fig, ax = plt.subplots(figsize=(5.5, 3.2))
 fig.patch.set_facecolor("#111827")
 ax.set_facecolor("#111827")
 
-ax.grid(color="#1e293b", linestyle="--", linewidth=0.7, alpha=1.0)
+ax.grid(color="#334155", linestyle="--", linewidth=0.7, alpha=1.0)
 ax.set_axisbelow(True)
 
 plotted = False
@@ -235,21 +235,21 @@ if show_brake:
 
 if st.session_state.stimulated:
     ax.axvspan(0, 50, alpha=0.03, color="#ef4444")
-    ax.text(1, 1.41, "⬤ bacteria present", color="#ef444466",
-            fontsize=7.5, fontstyle="italic")
+    ax.text(1, 1.41, "⬤ bacteria present", fontsize=7.5,
+            fontstyle="italic", color="#ffffff99")
 
-ax.set_xlabel("Time (minutes)", color="#64748b", fontsize=9)
-ax.set_ylabel("Activity Level", color="#64748b", fontsize=9)
+ax.set_xlabel("Time (minutes)", color="#ffffff", fontsize=9)
+ax.set_ylabel("Activity Level", color="#ffffff", fontsize=9)
 ax.set_ylim(0, 1.5)
 ax.set_xlim(0, 50)
-ax.tick_params(colors="#475569", labelsize=8)
+ax.tick_params(colors="#ffffff", labelsize=8)
 for spine in ax.spines.values():
-    spine.set_edgecolor("#1e293b")
+    spine.set_edgecolor("#ffffff")
 
 if plotted:
     ax.legend(
-        facecolor="#0f172a", edgecolor="#1e293b",
-        labelcolor="#94a3b8", fontsize=8,
+        facecolor="#0f172a", edgecolor="#334155",
+        labelcolor="#ffffff", fontsize=8,
         loc="upper right", framealpha=1
     )
 

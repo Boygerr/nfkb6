@@ -191,20 +191,20 @@ I_end  = float(sol.y[3, -1])
 # ── NARRATIVE ─────────────────────────────────────────────────────────────────
 def get_narrative():
     if not st.session_state.stimulated:
-        return "#1e293b", "😴  Cell at rest — no threat detected.", \
-            "The Brake (IκBα) is holding the Alarm Signal (NF-κB) in the cytoplasm."
+        return "#1e293b", "😴  Cell at rest, no threat detected.", \
+            "The Brake (IκBα) is blocking the Alarm Signal (NF-κB)"
     if brake_blocker > 0.5:
         return "#1a1a2e", "🛑  Brake locked — Alarm cannot activate.", \
-            "The IκBα phosphorylation inhibitor prevents the Brake from being degraded. " \
-            "NF-κB stays trapped in the cytoplasm — no immune response fires."
+            "The 'Brake protector' prevents the Brake from being degraded. " \
+            "NF-κB stays trapped, no immune response"
     if alarm_blocker > 0.5:
-        return "#1a1a2e", "🚫  Brake released, but Alarm blocked at the nucleus.", \
-            "Bacteria degraded the Brake as normal — but NF-κB cannot translocate. " \
+        return "#1a1a2e", "🚫  Brake released, but Alarm can't ring.", \
+            "Bacteria degraded the Brake as normal but Alarm cannot activate. " \
             "The Brake is gone, yet no response fires. The two steps are independent."
     if Nn_end > 0.15:
-        return "#1c1a0e", "⚡  Alarm activated — Brake rebuilding.", \
-            "IKK phosphorylated IκBα, releasing NF-κB into the nucleus. " \
-            "The cell is rebuilding the Brake via negative feedback to limit the response."
+        return "#1c1a0e", "⚡  Alarm activated, Brake rebuilding.", \
+            "The brake has been broken, releasing the alarm which can ring. " \
+            "The cell is rebuilding the Brake to limit the response."
     return "#1e293b", "🔬  Processing threat...", \
         "Watch how the Brake and Alarm Signal interact over time."
 
@@ -269,3 +269,4 @@ with st.expander("📖  Glossary", expanded=False):
     Kinase complex activated downstream of TLR (Toll-like receptor) when bacteria are detected. Phosphorylates IκBα, marking it for degradation.
     </div>
     """, unsafe_allow_html=True)
+

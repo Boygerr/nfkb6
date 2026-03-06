@@ -6,6 +6,23 @@ import matplotlib.pyplot as plt
 st.title("NF-κB – IκBα – TNF Dynamics During TLR Signalling")
 
 # ----------------------------
+# Pretreatment
+# ----------------------------
+
+st.sidebar.header("Pretreatment")
+
+nfkb_inhib = st.sidebar.slider(
+    "NF-κB Transport Inhibitor)",
+    0.0, 1.0, 0.0
+)
+
+ikba_inhib = st.sidebar.slider(
+    "IκBα Activation Inhibitor",
+    0.0, 1.0, 0.0
+)
+
+
+# ----------------------------
 # Stimulus Button (replaces slider)
 # ----------------------------
 
@@ -15,7 +32,7 @@ st.sidebar.header("Stimulus")
 if "tlr_strength" not in st.session_state:
     st.session_state.tlr_strength = 0.0  # default = unstimulated
 
-if st.sidebar.button("Stimulate (LPS)"):
+if st.sidebar.button("Stimulate (Bacteria)"):
     st.session_state.tlr_strength = 0.2
 
 if st.sidebar.button("Reset (No Stimulus)"):
@@ -155,6 +172,7 @@ Question: What should inhibiting ikba and NFkB phosphorylation acomplish?
 - Reset the NFkB phosphorylation inhibitor and start increasing the ikba phosphorylation inhibitor
     - How does this differ to the NFkB phosphorylation inhibitor
 """)
+
 
 
 

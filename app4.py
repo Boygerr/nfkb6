@@ -136,9 +136,9 @@ with c2:
 st.markdown('<div class="section-label">Experimental Drugs</div>', unsafe_allow_html=True)
 
 brake_blocker_pct = st.slider(
-    "Chemically stop Brake degradation (%)",
+    "Chemically inhibit Stop from being broken (%)",
     0, 100, 0, 1,
-    help="Blocks IKK-mediated phosphorylation of IkBa — prevents the Brake from being degraded"
+    help="Blocks IKK-mediated phosphorylation of IkBa — prevents the Stop from being broken"
 )
 alarm_blocker_pct = st.slider(
     "Chemically stop Alarm from ringing (%)",
@@ -196,21 +196,21 @@ I_end  = float(sol.y[3, -1])
 def get_narrative():
     if not st.session_state.stimulated:
         return "#1e293b", "😴  Cell at rest, no threat detected.", \
-            "The Brake (IκBα) is blocking the Alarm Signal (NF-κB)"
+            "The Stop is blocking the Alarm Signal"
     if brake_blocker > 0.5:
-        return "#1a1a2e", "🛑  Brake locked — Alarm cannot activate.", \
-            "This drug prevents the Brake from being degraded. " \
+        return "#1a1a2e", "🛑  Stop locked — Alarm cannot activate.", \
+            "This drug prevents the Stop from being broken. " \
             "NF-κB stays trapped, no immune response"
     if alarm_blocker > 0.5:
-        return "#1a1a2e", "🚫  Brake released, but Alarm can't ring.", \
-            "Bacteria degraded the Brake as normal but Alarm cannot activate. " \
-            "The Brake is gone, yet no response fires. The two steps are independent."
+        return "#1a1a2e", "🚫  Stop is broken, but Alarm can't ring.", \
+            "Bacteria signal breaks the Stop as normal but Alarm cannot activate. " \
+            "The Stop is gone, yet no response fires. The two steps are independent."
     if Nn_end > 0.15:
-        return "#1c1a0e", "⚡  Alarm activated, Brake rebuilding.", \
-            "The brake has been degraded, releasing the alarm which can ring. " \
-            "The cell is rebuilding the Brake to limit the response."
+        return "#1c1a0e", "⚡  Alarm activated, Stop rebuilding.", \
+            "The Stop has been broken, releasing the alarm which can ring. " \
+            "The cell is rebuilding the Stop to limit the response."
     return "#1e293b", "🔬  Processing threat...", \
-        "Watch how the Brake and Alarm Signal interact over time."
+        "Watch how the Stop and Alarm Signal interact over time."
 
 bg, headline, body = get_narrative()
 st.markdown(
@@ -230,11 +230,11 @@ ax.set_axisbelow(True)
 plotted = False
 if show_alarm:
     ax.plot(sol.t, sol.y[1], color="#ef4444", linewidth=2.2,
-            label="Alarm Signal (NF-κB)", solid_capstyle="round")
+            label="Alarm", solid_capstyle="round")
     plotted = True
 if show_brake:
     ax.plot(sol.t, sol.y[3], color="#3b82f6", linewidth=2.2,
-            label="Brake (IκBα)", solid_capstyle="round")
+            label="Stop", solid_capstyle="round")
     plotted = True
 
 if st.session_state.stimulated:
@@ -267,11 +267,12 @@ with st.expander("📖  Glossary", expanded=False):
     <div class="glossary">
     <span>NF-κB</span> &nbsp;·&nbsp; <b>Alarm Signal</b><br>
     Transcription factor held inactive in the cytoplasm by IκBα. When freed, it enters the nucleus and switches on immune response genes.<br><br>
-    <span>IκBα</span> &nbsp;·&nbsp; <b>The Brake</b><br>
+    <span>IκBα</span> &nbsp;·&nbsp; <b>The Stop</b><br>
     Inhibitory protein that binds and sequesters NF-κB. Degraded by IKK kinase (activated by TLR signalling) to release NF-κB. Rebuilt via negative feedback.<br><br>
     <span>IKK</span> &nbsp;·&nbsp; <b>The Trigger</b><br>
     Kinase complex activated downstream of TLR (Toll-like receptor) when bacteria are detected. Phosphorylates IκBα, marking it for degradation.
     </div>
     """, unsafe_allow_html=True)
+
 
 
